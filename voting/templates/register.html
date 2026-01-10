@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-4 shadow">
+  <h3>Voter Registration</h3>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <label>Voter ID</label>
+    <input type="text" name="voter_id" class="form-control mb-2" required>
+
+    {{ form.as_p }}
+
+    <button class="btn btn-primary w-100">Register</button>
+  </form>
+</div>
+{% endblock %}
+

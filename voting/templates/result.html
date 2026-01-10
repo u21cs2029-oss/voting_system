@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-4 shadow">
+  <h3>Election Results</h3>
+  {% for r in results %}
+    <p><strong>{{ r.candidate__name }}</strong> : {{ r.total }} votes</p>
+  {% endfor %}
+</div>
+{% endblock %}
+

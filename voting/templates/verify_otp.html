@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-4 shadow">
+  <h3>Enter OTP</h3>
+
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <input class="form-control mb-2" name="otp" placeholder="Enter OTP" required>
+    <button class="btn btn-success w-100">Verify OTP</button>
+  </form>
+</div>
+{% endblock %}

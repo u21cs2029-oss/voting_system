@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-4 shadow">
+  <h3>Cast Your Vote</h3>
+  <form method="post">
+    {% csrf_token %}
+    {% for c in candidates %}
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="candidate" value="{{ c.id }}" required>
+        <label class="form-check-label">
+          {{ c.name }} ({{ c.party }})
+        </label>
+      </div>
+    {% endfor %}
+    <button class="btn btn-warning mt-3 w-100">Submit Vote</button>
+  </form>
+</div>
+{% endblock %}

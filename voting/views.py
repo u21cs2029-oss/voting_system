@@ -9,6 +9,8 @@ from .forms import VoterRegistrationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from .models import Candidate, Vote
+def home(request):
+    return render(request, 'home.html')
 
 def register(request):
     if request.method == 'POST':

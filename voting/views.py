@@ -59,13 +59,17 @@ def register(request):
                 defaults={'code': otp_code}
             )
 
-            send_mail(
-                subject='Your Voting OTP',
-                message=f'Your OTP is: {otp_code}',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False,
-            )
+            # ✅ SAFE EMAIL SEND (NO SERVER CRASH)
+            try:
+                send_mail(
+                    subject='Your Voting OTP',
+                    message=f'Your OTP is: {otp_code}',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    fail_silently=True,   # 🔥 VERY IMPORTANT
+                )
+            except Exception as e:
+                print("Email error:", e)
 
             request.session['otp_user'] = user.username
             return redirect('verify_otp')
@@ -137,13 +141,17 @@ def otp_login(request):
             defaults={'code': otp_code}
         )
 
-        send_mail(
-            subject='Your Voting OTP',
-            message=f'Your OTP is: {otp_code}',
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
-            fail_silently=False,
-        )
+        # ✅ SAFE EMAIL SEND
+        try:
+            send_mail(
+                subject='Your Voting OTP',
+                message=f'Your OTP is: {otp_code}',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=True,
+            )
+        except Exception as e:
+            print("Email error:", e)
 
         request.session['otp_user'] = user.username
         return redirect('verify_otp')
@@ -160,6 +168,12 @@ def vote(request):
         return render(request, 'voting/vote.html', {
             'candidates': [],
             'error': 'Voter profile not found'
+        })
+
+    if not profile.constituency:
+        return render(request, 'voting/vote.html', {
+            'candidates': [],
+            'error': 'Constituency not assigned'
         })
 
     if Vote.objects.filter(user=request.user).exists():

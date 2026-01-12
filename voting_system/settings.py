@@ -159,8 +159,9 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 DEFAULT_FROM_EMAIL = os.environ.get(
     'DEFAULT_FROM_EMAIL',
-    'onlinevoting@brevo.com'
+    'no-reply@brevo.com'
 )
+
 
 EMAIL_TIMEOUT = 20  # prevents worker timeout (IMPORTANT)
 

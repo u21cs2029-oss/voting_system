@@ -13,6 +13,7 @@ from .forms import VoterRegistrationForm
 
 logger = logging.getLogger(__name__)
 
+
 # ---------------- HOME ----------------
 def home(request):
     return render(request, 'home.html')
@@ -30,7 +31,7 @@ def register(request):
                 return render(request, 'register.html', {
                     'form': form,
                     'constituencies': Constituency.objects.all(),
-                    'error': 'Voter ID already exists'
+                    'error': 'Voter ID already registered'
                 })
 
             user = form.save(commit=False)
@@ -44,23 +45,22 @@ def register(request):
                 constituency=constituency
             )
 
-            # OTP
             otp_code = str(random.randint(100000, 999999))
             OTP.objects.update_or_create(user=user, defaults={'code': otp_code})
 
-            # 🔐 SAFE EMAIL SEND
+            # SAFE EMAIL SEND (WILL NOT CRASH)
             try:
                 send_mail(
                     subject='Your Voting OTP',
                     message=f'Your OTP is: {otp_code}',
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[user.email],
-                    fail_silently=True,  # ✅ IMPORTANT
+                    fail_silently=True,
                 )
             except Exception as e:
-                logger.error(f"OTP Email failed: {e}")
+                logger.error(f"Email error: {e}")
 
-            # ✅ LOG OTP FOR DEMO
+            # IMPORTANT FOR DEMO
             print("OTP FOR USER:", user.username, otp_code)
 
             request.session['otp_user'] = user.username
@@ -73,6 +73,53 @@ def register(request):
         'form': form,
         'constituencies': Constituency.objects.all()
     })
+
+
+# ---------------- OTP LOGIN ----------------
+def otp_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        voter_id = request.POST.get('voter_id')
+
+        user = authenticate(request, username=username, password=password)
+        if not user:
+            return render(request, 'otp_login.html', {
+                'error': 'Invalid credentials'
+            })
+
+        try:
+            profile = VoterProfile.objects.get(user=user)
+        except VoterProfile.DoesNotExist:
+            return render(request, 'otp_login.html', {
+                'error': 'Profile not found'
+            })
+
+        if profile.voter_id != voter_id:
+            return render(request, 'otp_login.html', {
+                'error': 'Invalid Voter ID'
+            })
+
+        otp_code = str(random.randint(100000, 999999))
+        OTP.objects.update_or_create(user=user, defaults={'code': otp_code})
+
+        try:
+            send_mail(
+                subject='Your Voting OTP',
+                message=f'Your OTP is: {otp_code}',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=True,
+            )
+        except Exception as e:
+            logger.error(f"OTP login email failed: {e}")
+
+        print("LOGIN OTP:", user.username, otp_code)
+
+        request.session['otp_user'] = user.username
+        return redirect('verify_otp')
+
+    return render(request, 'otp_login.html')
 
 
 # ---------------- VERIFY OTP ----------------
@@ -90,6 +137,40 @@ def verify_otp(request):
             otp_obj.delete()
             return redirect('vote')
         else:
-            return render(request, 'verify_otp.html', {'error': 'Invalid OTP'})
+            return render(request, 'verify_otp.html', {
+                'error': 'Invalid OTP'
+            })
 
     return render(request, 'verify_otp.html')
+
+
+# ---------------- VOTE ----------------
+@login_required
+def vote(request):
+    profile = VoterProfile.objects.get(user=request.user)
+
+    if Vote.objects.filter(user=request.user).exists():
+        return render(request, 'already_voted.html')
+
+    candidates = Candidate.objects.filter(constituency=profile.constituency)
+
+    if request.method == 'POST':
+        candidate = Candidate.objects.get(id=request.POST.get('candidate'))
+        Vote.objects.create(user=request.user, candidate=candidate)
+        return render(request, 'voting/vote_success.html', {
+            'constituency': profile.constituency.name
+        })
+
+    return render(request, 'voting/vote.html', {
+        'candidates': candidates
+    })
+
+
+# ---------------- RESULT ----------------
+@login_required
+def result(request):
+    results = Vote.objects.values(
+        'candidate__name'
+    ).annotate(total=Count('candidate'))
+    return render(request, 'result.html', {'results': results})
+

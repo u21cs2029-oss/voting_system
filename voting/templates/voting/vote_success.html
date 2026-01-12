@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow p-5 text-center">
+
+  <h2 class="text-success mb-3">✅ Vote Cast Successfully</h2>
+
+  <p class="fs-5">
+    🗳️ <em>“Your vote is your voice. Thank you for strengthening democracy.”</em>
+  </p>
+
+  <p class="mt-3">
+    Constituency:
+    <strong>{{ constituency }}</strong>
+  </p>
+
+  <hr>
+
+  <p class="text-muted">
+    🇮🇳 Every vote counts. Every voice matters.
+  </p>
+
+  <!-- ✅ LOGOUT FIX -->
+  <form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-outline-danger mt-3">
+      Logout
+    </button>
+  </form>
+
+</div>
+{% endblock %}

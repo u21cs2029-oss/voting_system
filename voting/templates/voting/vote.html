@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+  <h3 class="mb-4">Cast Your Vote</h3>
+
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    {% for c in candidates %}
+      <div class="card mb-3 p-3">
+        <div class="row align-items-center">
+          <div class="col-md-3">
+            {% if c.photo %}
+              <img src="{{ c.photo.url }}" class="img-fluid rounded" style="max-height:150px;">
+            {% else %}
+              <p>No Photo</p>
+            {% endif %}
+          </div>
+          <div class="col-md-9">
+            <input type="radio" name="candidate" value="{{ c.id }}" required>
+            <strong>{{ c.name }}</strong> ({{ c.party }})
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+    <button class="btn btn-success w-100 mt-3">Submit Vote</button>
+  </form>
+</div>
+{% endblock %}
+

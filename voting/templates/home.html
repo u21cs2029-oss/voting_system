@@ -1,12 +1,44 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Online Voting System</title>
-</head>
-<body>
-    <h1>Welcome to Online Voting System</h1>
+{% extends 'base.html' %}
 
-    <a href="{% url 'login' %}">Login</a> |
-    <a href="{% url 'register' %}">Register</a>
-</body>
-</html>
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-10">
+
+    <div class="card shadow-lg border-0 p-5 text-center">
+      <h1 class="fw-bold mb-3">🗳️ Online Voting System</h1>
+
+      <p class="fs-5 text-muted mb-4">
+        A secure, transparent, and constituency-based digital voting platform.
+      </p>
+
+      <div class="row mt-4">
+        <div class="col-md-4">
+          <h5>🔐 Secure</h5>
+          <p class="text-muted">OTP-based authentication ensures voter safety.</p>
+        </div>
+        <div class="col-md-4">
+          <h5>📍 Constituency Based</h5>
+          <p class="text-muted">Vote only for candidates in your constituency.</p>
+        </div>
+        <div class="col-md-4">
+          <h5>✅ One Vote Only</h5>
+          <p class="text-muted">System prevents duplicate voting.</p>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+          📝 New Voter Registration
+        </a>
+        <a href="{% url 'login' %}" class="btn btn-outline-dark btn-lg">
+          🔑 Login & Vote
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

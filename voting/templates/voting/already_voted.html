@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+
+    <div class="card shadow border-0 p-5 text-center rounded-4">
+
+      <h2 class="text-danger mb-3">⚠️ Vote Already Cast</h2>
+
+      <p class="fs-5">
+        🗳️ <em>You have already exercised your right to vote.</em>
+      </p>
+
+      <p class="text-muted mt-3">
+        For security and fairness, each voter can vote only once.
+      </p>
+
+      <hr>
+
+      <p class="fw-semibold text-success">
+        🇮🇳 Thank you for participating in democracy!
+      </p>
+
+      <a href="{% url 'logout' %}" class="btn btn-outline-danger mt-3">
+        Logout
+      </a>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

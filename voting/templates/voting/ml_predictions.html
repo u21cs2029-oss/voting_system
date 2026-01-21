@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Predictions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 { font-size: 2em; margin-bottom: 8px; }
+        
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            padding: 10px 20px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 600;
+            border: 2px solid #667eea;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+        
+        .nav-link:hover { background: #667eea; color: white; }
+        
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .model-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .metric-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #667eea;
+        }
+        
+        .metric-box h3 {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .metric-box p {
+            font-size: 2em;
+            color: #667eea;
+            font-weight: 700;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.9em;
+        }
+        
+        table tr:hover { background: #f8f9fa; }
+        
+        .probability-bar {
+            background: #e0e0e0;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .probability-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .badge-high {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 Machine Learning Predictions</h1>
+        <p>Voter turnout forecasting using ML algorithms</p>
+    </div>
+    
+    <div class="nav-links">
+        <a href="{% url 'analytics_dashboard' %}" class="nav-link">📊 Dashboard</a>
+        <a href="{% url 'pattern_analysis' %}" class="nav-link">🔍 Patterns</a>
+        <a href="{% url 'ml_predictions' %}" class="nav-link">🤖 ML Predictions</a>
+        <a href="{% url 'anomaly_detection' %}" class="nav-link">⚠️ Anomalies</a>
+        <a href="{% url 'home' %}" class="nav-link">🏠 Home</a>
+    </div>
+    
+    <!-- Model Status -->
+    <div class="section">
+        <h2 class="section-title">📊 Model Status</h2>
+        <p>
+            <strong>Model:</strong> Logistic Regression
+            <span class="model-status {% if training_results.success %}status-success{% else %}status-warning{% endif %}">
+                {{ model_status }}
+            </span>
+        </p>
+        <p style="margin-top: 10px;">
+            <strong>Training Samples:</strong> {{ total_training_samples }}
+        </p>
+        
+        {% if training_results.success %}
+        <div class="info-box">
+            <strong>ℹ️ How it works:</strong> 
+            The model learns from {{ total_training_samples }} historical voting records. 
+            It analyzes patterns like "people vote more at 6 PM than 3 AM" to predict future turnout.
+        </div>
+        {% else %}
+        <div class="info-box" style="background: #fff3cd; border-color: #856404;">
+            <strong>⚠️ Note:</strong> {{ training_results.message }}
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Model Performance -->
+    {% if training_results.success %}
+    <div class="section">
+        <h2 class="section-title">📈 Model Performance Metrics</h2>
+        <div class="metrics-grid">
+            <div class="metric-box">
+                <h3>Training Accuracy</h3>
+                <p>{{ training_results.train_accuracy }}%</p>
+            </div>
+            <div class="metric-box">
+                <h3>Testing Accuracy</h3>
+                <p>{{ training_results.test_accuracy }}%</p>
+            </div>
+            <div class="metric-box">
+                <h3>Samples Used</h3>
+                <p>{{ training_results.samples_trained }}</p>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <strong>📚 For Viva:</strong> 
+            Accuracy shows how well the model predicts. Above 70% is considered good. 
+            Our model achieved {{ training_results.test_accuracy }}% accuracy on test data.
+        </div>
+    </div>
+    
+    <!-- Predictions -->
+    <div class="section">
+        <h2 class="section-title">🔮 Turnout Predictions</h2>
+        <p style="margin-bottom: 15px;">
+            Based on historical data, here are predicted turnout probabilities for different times:
+        </p>
+        
+        {% if predictions %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Probability</th>
+                    <th>Percentage</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pred in predictions %}
+                <tr>
+                    <td><strong>{{ pred.day }}</strong></td>
+                    <td>{{ pred.hour }}</td>
+                    <td>
+                        <div class="probability-bar">
+                            <div class="probability-fill" data-width="{{ pred.percentage }}"></div>
+                        </div>
+                    </td>
+                    <td>{{ pred.percentage }}%</td>
+                    <td>
+                        <span class="badge badge-{% if pred.status == 'High' %}high{% elif pred.status == 'Medium' %}medium{% else %}low{% endif %}">
+                            {{ pred.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="info-box" style="margin-top: 20px;">
+            <strong>💡 Interpretation:</strong>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li><strong>High (>70%):</strong> Expect good voter turnout - deploy more resources</li>
+                <li><strong>Medium (40-70%):</strong> Moderate turnout expected - standard staffing</li>
+                <li><strong>Low (<40%):</strong> Low turnout predicted - minimal resources needed</li>
+            </ul>
+        </div>
+        {% else %}
+        <p>No predictions available yet. Model needs more training data.</p>
+        {% endif %}
+    </div>
+    
+    <!-- ML Explanation for Viva -->
+    <div class="section">
+        <h2 class="section-title">🎓 ML Explanation (For Viva/Report)</h2>
+        
+        <h3 style="margin-top: 15px; color: #667eea;">Algorithm Used:</h3>
+        <p style="margin: 10px 0;"><strong>Logistic Regression</strong></p>
+        <p>A supervised learning algorithm that predicts probability (0 to 1) of an event occurring.</p>
+        
+        <h3 style="margin-top: 20px; color: #667eea;">How It Works:</h3>
+        <ol style="margin-left: 20px; line-height: 1.8;">
+            <li><strong>Data Collection:</strong> Historical voting data (time, day, constituency)</li>
+            <li><strong>Feature Engineering:</strong> Convert time and day into numerical features</li>
+            <li><strong>Training:</strong> Model learns patterns from {{ total_training_samples }} samples</li>
+            <li><strong>Prediction:</strong> Given new time/day, predict turnout probability</li>
+            <li><strong>Validation:</strong> Test accuracy on unseen data</li>
+        </ol>
+        
+        <h3 style="margin-top: 20px; color: #667eea;">Business Value:</h3>
+        <ul style="margin-left: 20px; line-height: 1.8;">
+            <li>Optimize voting booth staffing based on predicted turnout</li>
+            <li>Plan resource allocation efficiently</li>
+            <li>Identify best times for voter awareness campaigns</li>
+            <li>Evidence-based decision making for election commission</li>
+        </ul>
+    </div>
+    {% endif %}
+    
+    {% if not training_results.success %}
+    <div class="section">
+        <h2 class="section-title">🚀 Getting Started</h2>
+        <p>To enable ML predictions:</p>
+        <ol style="margin: 15px 0 15px 20px; line-height: 1.8;">
+            <li>Cast at least 10 votes through the voting system</li>
+            <li>Ensure votes are spread across different hours</li>
+            <li>Refresh this page to retrain the model</li>
+        </ol>
+        <p><strong>Current votes:</strong> {{ total_training_samples }}</p>
+        <p><strong>Needed:</strong> At least 10 votes</p>
+    </div>
+    {% endif %}
+    
+    <script>
+        // Apply width to probability bars using JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.probability-fill').forEach(function(el) {
+                const width = el.getAttribute('data-width');
+                if (width) {
+                    el.style.width = width + '%';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

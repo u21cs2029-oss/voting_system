@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 { font-size: 2em; margin-bottom: 8px; }
+        
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            padding: 10px 20px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 600;
+            border: 2px solid #667eea;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+        
+        .nav-link:hover { background: #667eea; color: white; }
+        
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 15px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-box h3 {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .stat-box p {
+            font-size: 1.8em;
+            color: #667eea;
+            font-weight: 700;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        
+        table td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.9em;
+        }
+        
+        table tr:hover { background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Voting Pattern Analysis</h1>
+        <p>Detailed analysis of voting trends and behaviors</p>
+    </div>
+    
+    <div class="nav-links">
+        <a href="{% url 'analytics_dashboard' %}" class="nav-link">📊 Dashboard</a>
+        <a href="{% url 'pattern_analysis' %}" class="nav-link">🔍 Patterns</a>
+        <a href="{% url 'ml_predictions' %}" class="nav-link">🤖 ML Predictions</a>
+        <a href="{% url 'anomaly_detection' %}" class="nav-link">⚠️ Anomalies</a>
+        <a href="{% url 'home' %}" class="nav-link">🏠 Home</a>
+    </div>
+    
+    <!-- Peak Times Info -->
+    <div class="section">
+        <h2 class="section-title">⏰ Peak Voting Analysis</h2>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <h3>Peak Hour</h3>
+                <p>{{ peak_times.peak_hour|default:"N/A" }}:00</p>
+            </div>
+            <div class="stat-box">
+                <h3>Peak Hour Votes</h3>
+                <p>{{ peak_times.peak_votes|default:"0" }}</p>
+            </div>
+            <div class="stat-box">
+                <h3>Total Votes Analyzed</h3>
+                <p>{{ total_votes }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hourly Distribution -->
+    <div class="section">
+        <h2 class="section-title">📈 Hour-by-Hour Distribution</h2>
+        <div class="chart-container">
+            <canvas id="hourlyChart"></canvas>
+        </div>
+        
+        {% if hourly_distribution %}
+        <h3 style="margin-top: 20px; font-size: 1.1em;">Hourly Breakdown:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Hour</th>
+                    <th>Votes</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hour, count in hourly_distribution.items %}
+                <tr>
+                    <td>{{ hour }}:00</td>
+                    <td><strong>{{ count }}</strong></td>
+                    <td>{% widthratio count total_votes 100 %}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No hourly data available yet.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Day-wise Distribution -->
+    <div class="section">
+        <h2 class="section-title">📅 Day-wise Voting Pattern</h2>
+        <div class="chart-container">
+            <canvas id="dayChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Party Performance -->
+    <div class="section">
+        <h2 class="section-title">🏛️ Party-wise Performance</h2>
+        {% if party_performance %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Party</th>
+                    <th>Votes</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for party, data in party_performance.items %}
+                <tr>
+                    <td><strong>{{ party }}</strong></td>
+                    <td>{{ data.votes }}</td>
+                    <td>{{ data.percentage }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No party data available yet.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Constituency Turnout -->
+    <div class="section">
+        <h2 class="section-title">📍 Constituency-wise Turnout</h2>
+        {% if constituency_turnout %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Constituency</th>
+                    <th>Votes Cast</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for const, votes in constituency_turnout.items %}
+                <tr>
+                    <td>{{ const }}</td>
+                    <td><strong>{{ votes }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No constituency data available yet.</p>
+        {% endif %}
+    </div>
+    
+    <script>
+        // Hourly Chart - Parse Django data safely
+        const hourlyDataRaw = '{{ hourly_distribution|safe }}';
+        const hourlyData = JSON.parse(hourlyDataRaw.replace(/'/g, '"'));
+        const hourlyLabels = Object.keys(hourlyData).map(h => h + ':00');
+        const hourlyValues = Object.values(hourlyData);
+        
+        const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+        new Chart(hourlyCtx, {
+            type: 'line',
+            data: {
+                labels: hourlyLabels,
+                datasets: [{
+                    label: 'Votes per Hour',
+                    data: hourlyValues,
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                }
+            }
+        });
+        
+        // Day Chart - Parse Django data safely
+        const dayDataRaw = '{{ day_distribution|safe }}';
+        const dayData = JSON.parse(dayDataRaw.replace(/'/g, '"'));
+        const dayLabels = Object.keys(dayData);
+        const dayValues = Object.values(dayData);
+        
+        const dayCtx = document.getElementById('dayChart').getContext('2d');
+        new Chart(dayCtx, {
+            type: 'bar',
+            data: {
+                labels: dayLabels,
+                datasets: [{
+                    label: 'Votes per Day',
+                    data: dayValues,
+                    backgroundColor: 'rgba(118, 75, 162, 0.7)',
+                    borderColor: 'rgba(118, 75, 162, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 280px;
+            margin-bottom: 15px;
+        }
+        
+        .anomaly-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+        
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            padding: 10px 20px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 600;
+            border: 2px solid #667eea;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+        
+        .nav-link:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        
+        table td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.9em;
+        }
+        
+        table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.5em; }
+            .section { padding: 15px; }
+            .chart-container { height: 220px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Data Science Analytics</h1>
+        <p>Comprehensive voting insights powered by ML</p>
+    </div>
+    
+    <div class="nav-links">
+        <a href="{% url 'analytics_dashboard' %}" class="nav-link">📊 Dashboard</a>
+        <a href="{% url 'pattern_analysis' %}" class="nav-link">🔍 Patterns</a>
+        <a href="{% url 'ml_predictions' %}" class="nav-link">🤖 ML Predictions</a>
+        <a href="{% url 'anomaly_detection' %}" class="nav-link">⚠️ Anomalies</a>
+        <a href="{% url 'home' %}" class="nav-link">🏠 Home</a>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">🗳️</div>
+            <div class="stat-value">{{ total_votes }}</div>
+            <div class="stat-label">Total Votes</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value">{{ total_voters }}</div>
+            <div class="stat-label">Registered Voters</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">📈</div>
+            <div class="stat-value">{{ turnout_percentage }}%</div>
+            <div class="stat-label">Voter Turnout</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">📍</div>
+            <div class="stat-value">{{ total_constituencies }}</div>
+            <div class="stat-label">Constituencies</div>
+        </div>
+    </div>
+    
+    <!-- Charts -->
+    <div class="section">
+        <h2 class="section-title">📈 Hourly Voting Pattern</h2>
+        <div class="chart-container">
+            <canvas id="hourlyChart"></canvas>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">🏛️ Party Performance</h2>
+        <div class="chart-container">
+            <canvas id="partyChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Peak Times -->
+    <div class="section">
+        <h2 class="section-title">⏰ Peak Voting Times</h2>
+        {% if peak_times.peak_hour %}
+            <p><strong>Peak Hour:</strong> {{ peak_times.peak_hour }}:00</p>
+            <p><strong>Votes in Peak Hour:</strong> {{ peak_times.peak_votes }}</p>
+        {% else %}
+            <p>No data available yet</p>
+        {% endif %}
+    </div>
+    
+    <!-- Anomalies -->
+    <div class="section">
+        <h2 class="section-title">⚠️ Security Check</h2>
+        <p>
+            <strong>Status:</strong>
+            {% if anomalies.total_anomalies == 0 %}
+                <span class="anomaly-badge badge-success">✓ All Clear</span>
+            {% elif anomalies.total_anomalies < 5 %}
+                <span class="anomaly-badge badge-warning">⚠ Minor Issues</span>
+            {% else %}
+                <span class="anomaly-badge badge-danger">❌ Anomalies Detected</span>
+            {% endif %}
+        </p>
+        <p><strong>Total Anomalies:</strong> {{ anomalies.total_anomalies }}</p>
+        
+        {% if anomalies.unusual_voting_times %}
+            <h3 style="margin-top: 15px; font-size: 1.1em;">Unusual Voting Times:</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hour</th>
+                        <th>Votes</th>
+                        <th>Z-Score</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in anomalies.unusual_voting_times %}
+                    <tr>
+                        <td>{{ item.hour }}:00</td>
+                        <td>{{ item.votes }}</td>
+                        <td>{{ item.z_score }}</td>
+                        <td>{{ item.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+    
+    <script>
+        // Prepare data - Convert Django template variables to JavaScript
+        // Use JSON parsing for safer data handling
+        const hourlyLabels = JSON.parse('{{ hourly_labels|safe }}');
+        const hourlyValues = JSON.parse('{{ hourly_values|safe }}');
+        const partyLabels = JSON.parse('{{ party_labels|safe }}');
+        const partyValues = JSON.parse('{{ party_values|safe }}');
+        
+        // Hourly Distribution Chart
+        const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+        new Chart(hourlyCtx, {
+            type: 'bar',
+            data: {
+                labels: hourlyLabels,
+                datasets: [{
+                    label: 'Votes per Hour',
+                    data: hourlyValues,
+                    backgroundColor: 'rgba(102, 126, 234, 0.7)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                }
+            }
+        });
+        
+        // Party Performance Chart
+        const partyCtx = document.getElementById('partyChart').getContext('2d');
+        new Chart(partyCtx, {
+            type: 'pie',
+            data: {
+                labels: partyLabels,
+                datasets: [{
+                    data: partyValues,
+                    backgroundColor: [
+                        'rgba(102, 126, 234, 0.8)',
+                        'rgba(118, 75, 162, 0.8)',
+                        'rgba(255, 159, 64, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

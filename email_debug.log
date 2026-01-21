@@ -1,0 +1,59 @@
+INFO 2026-01-13 18:34:02,753 utils Attempting to send OTP to lingupanther@gmail.com for registration
+INFO 2026-01-13 18:34:10,404 views User ram registered successfully, OTP sent to lingupanther@gmail.com
+INFO 2026-01-13 18:34:44,985 utils OTP verified successfully
+INFO 2026-01-13 18:34:45,704 views User ram verified OTP successfully
+INFO 2026-01-13 18:35:06,334 views User ram voted for K.Annamalai
+INFO 2026-01-13 18:37:16,944 utils Attempting to send OTP to lingupanther@gmail.com for login
+INFO 2026-01-13 18:37:21,276 views OTP sent to lingupanther@gmail.com for login
+INFO 2026-01-13 18:38:16,497 utils OTP verified successfully
+INFO 2026-01-13 18:38:17,397 views User ram verified OTP successfully
+INFO 2026-01-13 23:29:12,682 utils Attempting to send OTP to cehir84429@ixospace.com for registration
+INFO 2026-01-13 23:29:18,736 utils OTP sent successfully to cehir84429@ixospace.com
+INFO 2026-01-13 23:29:18,737 views User raja registered successfully, OTP sent to cehir84429@ixospace.com
+INFO 2026-01-13 23:31:12,746 utils OTP verified successfully
+INFO 2026-01-13 23:31:13,347 views User raja verified OTP successfully
+INFO 2026-01-13 23:31:40,858 views User raja voted for K.Annamalai
+INFO 2026-01-13 23:33:58,972 utils Attempting to send OTP to cehir84429@ixospace.com for login
+INFO 2026-01-13 23:34:03,049 utils OTP sent successfully to cehir84429@ixospace.com
+INFO 2026-01-13 23:34:03,056 views OTP sent to cehir84429@ixospace.com for login
+INFO 2026-01-13 23:35:16,066 utils OTP verified successfully
+INFO 2026-01-13 23:35:16,522 views User raja verified OTP successfully
+INFO 2026-01-14 08:53:17,220 utils Attempting to send OTP to moface1600@jparksky.com for registration
+INFO 2026-01-14 08:53:22,553 utils OTP sent successfully to moface1600@jparksky.com
+INFO 2026-01-14 08:53:22,554 views User ravi registered successfully, OTP sent to moface1600@jparksky.com
+INFO 2026-01-14 08:53:54,144 utils OTP verified successfully
+INFO 2026-01-14 08:53:54,893 views User ravi verified OTP successfully
+INFO 2026-01-14 08:54:09,157 views User ravi voted for K.Annamalai
+INFO 2026-01-14 08:55:01,307 utils Attempting to send OTP to moface1600@jparksky.com for login
+INFO 2026-01-14 08:55:05,197 utils OTP sent successfully to moface1600@jparksky.com
+INFO 2026-01-14 08:55:05,203 views OTP sent to moface1600@jparksky.com for login
+INFO 2026-01-14 08:55:35,367 utils OTP verified successfully
+INFO 2026-01-14 08:55:35,828 views User ravi verified OTP successfully
+INFO 2026-01-14 09:00:04,242 utils Attempting to send OTP to nimiy42452@jparksky.com for registration
+INFO 2026-01-14 09:00:07,878 utils OTP sent successfully to nimiy42452@jparksky.com
+INFO 2026-01-14 09:00:07,882 views User mohan registered successfully, OTP sent to nimiy42452@jparksky.com
+INFO 2026-01-14 09:01:08,766 utils OTP verified successfully
+INFO 2026-01-14 09:01:09,144 views User mohan verified OTP successfully
+INFO 2026-01-14 09:01:55,589 views User mohan voted for K.Annamalai
+INFO 2026-01-14 09:14:44,573 utils Attempting to send OTP to nimiy42452@jparksky.com for login
+INFO 2026-01-14 09:14:50,247 utils OTP sent successfully to nimiy42452@jparksky.com
+INFO 2026-01-14 09:14:50,254 views OTP sent to nimiy42452@jparksky.com for login
+INFO 2026-01-14 09:15:29,887 utils OTP verified successfully
+INFO 2026-01-14 09:15:30,195 views User mohan verified OTP successfully
+INFO 2026-01-14 09:24:03,965 utils Attempting to send OTP to febic89593@ixospace.com for registration
+INFO 2026-01-14 09:24:07,666 utils OTP sent successfully to febic89593@ixospace.com
+INFO 2026-01-14 09:24:07,668 views User raguraman registered successfully, OTP sent to febic89593@ixospace.com
+INFO 2026-01-14 09:24:45,724 utils OTP verified successfully
+INFO 2026-01-14 09:24:46,499 views User raguraman verified OTP successfully
+INFO 2026-01-14 09:25:02,104 views User raguraman voted for C.Joseph  Vijay
+INFO 2026-01-14 10:27:22,970 utils Attempting to send OTP to ropelot673@jparksky.com for registration
+INFO 2026-01-14 10:27:28,802 utils OTP sent successfully to ropelot673@jparksky.com
+INFO 2026-01-14 10:27:28,821 views User singaravelan registered successfully, OTP sent to ropelot673@jparksky.com
+INFO 2026-01-14 10:28:14,877 utils OTP verified successfully
+INFO 2026-01-14 10:28:15,319 views User singaravelan verified OTP successfully
+INFO 2026-01-14 10:28:34,474 views User singaravelan voted for Seeman
+INFO 2026-01-14 10:34:31,107 utils Attempting to send OTP to ropelot673@jparksky.com for login
+INFO 2026-01-14 10:34:35,235 utils OTP sent successfully to ropelot673@jparksky.com
+INFO 2026-01-14 10:34:35,237 views OTP sent to ropelot673@jparksky.com for login
+INFO 2026-01-14 10:36:02,181 utils OTP verified successfully
+INFO 2026-01-14 10:36:03,144 views User singaravelan verified OTP successfully

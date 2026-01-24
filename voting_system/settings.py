@@ -193,13 +193,13 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_TIMEOUT = 30
+EMAIL_TIMEOUT = 10
 
 # Email credentials from environment variables
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', 'noreply@voting.com')
-SERVER_EMAIL = os.environ.get('EMAIL_HOST_USER', 'server@voting.com')
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', 'onlinevoting032026@gmail.com')
+SERVER_EMAIL = os.environ.get('EMAIL_HOST_USER', 'onlinevoting032026@gmail.com')
 
 
 # --------------------------------------------------

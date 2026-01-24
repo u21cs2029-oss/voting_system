@@ -57,3 +57,50 @@ INFO 2026-01-14 10:34:35,235 utils OTP sent successfully to ropelot673@jparksky.
 INFO 2026-01-14 10:34:35,237 views OTP sent to ropelot673@jparksky.com for login
 INFO 2026-01-14 10:36:02,181 utils OTP verified successfully
 INFO 2026-01-14 10:36:03,144 views User singaravelan verified OTP successfully
+INFO 2026-01-21 11:52:18,387 utils Attempting to send OTP to wibed15989@noihse.com for registration
+INFO 2026-01-21 11:52:25,517 utils OTP sent successfully to wibed15989@noihse.com
+INFO 2026-01-21 11:52:25,520 views User munusamy registered successfully, OTP sent to wibed15989@noihse.com
+INFO 2026-01-21 11:53:32,624 utils OTP verified successfully
+INFO 2026-01-21 11:53:33,298 views User munusamy verified OTP successfully
+INFO 2026-01-21 11:53:46,907 views User munusamy voted for K.Annamalai
+INFO 2026-01-22 10:37:27,963 utils Attempting to send OTP to wibed15989@noihse.com for login
+INFO 2026-01-22 10:37:32,747 utils OTP sent successfully to wibed15989@noihse.com
+INFO 2026-01-22 10:37:32,748 views OTP sent to wibed15989@noihse.com for login
+INFO 2026-01-22 10:38:57,284 utils OTP verified successfully
+INFO 2026-01-22 10:38:58,151 views User munusamy verified OTP successfully
+INFO 2026-01-22 10:40:12,244 utils Attempting to send OTP to wibed15989@noihse.com for login
+INFO 2026-01-22 10:40:15,777 utils OTP sent successfully to wibed15989@noihse.com
+INFO 2026-01-22 10:40:15,778 views OTP sent to wibed15989@noihse.com for login
+INFO 2026-01-22 10:41:23,117 utils OTP verified successfully
+INFO 2026-01-22 10:41:23,781 views User munusamy verified OTP successfully
+INFO 2026-01-22 21:19:58,095 utils Attempting to send OTP to wibed15989@noihse.com for login
+INFO 2026-01-22 21:20:02,315 utils OTP sent successfully to wibed15989@noihse.com
+INFO 2026-01-22 21:20:02,316 views OTP sent to wibed15989@noihse.com for login
+WARNING 2026-01-22 21:21:28,485 utils OTP mismatch - Expected: 185496, Got: 185486
+WARNING 2026-01-22 21:21:28,487 views Failed OTP verification for user munusamy
+INFO 2026-01-22 21:21:48,049 utils OTP verified successfully
+INFO 2026-01-22 21:21:48,898 views User munusamy verified OTP successfully
+INFO 2026-01-22 21:27:48,625 utils Attempting to send OTP to wibed15989@noihse.com for login
+INFO 2026-01-22 21:27:51,796 utils OTP sent successfully to wibed15989@noihse.com
+INFO 2026-01-22 21:27:51,797 views OTP sent to wibed15989@noihse.com for login
+INFO 2026-01-22 21:28:41,894 utils OTP verified successfully
+INFO 2026-01-22 21:28:42,428 views User munusamy verified OTP successfully
+INFO 2026-01-23 09:53:51,536 utils Attempting to send OTP to wibed15989@noihse.com for login
+INFO 2026-01-23 09:53:56,169 utils OTP sent successfully to wibed15989@noihse.com
+INFO 2026-01-23 09:53:56,170 views OTP sent to wibed15989@noihse.com for login
+INFO 2026-01-23 09:55:36,492 utils OTP verified successfully
+INFO 2026-01-23 09:55:37,399 views User munusamy verified OTP successfully
+INFO 2026-01-24 09:58:05,126 utils Attempting to send OTP to wibed15989@noihse.com for login
+INFO 2026-01-24 09:58:09,924 utils OTP sent successfully to wibed15989@noihse.com
+INFO 2026-01-24 09:58:09,926 views OTP sent to wibed15989@noihse.com for login
+INFO 2026-01-24 10:03:13,228 utils Attempting to send OTP to gicete2030@okexbit.com for registration
+INFO 2026-01-24 10:03:16,685 utils OTP sent successfully to gicete2030@okexbit.com
+INFO 2026-01-24 10:03:16,691 views User parthiban registered successfully, OTP sent to gicete2030@okexbit.com
+INFO 2026-01-24 10:03:53,757 utils OTP verified successfully
+INFO 2026-01-24 10:03:54,367 views User parthiban verified OTP successfully
+INFO 2026-01-24 10:04:02,899 views User parthiban voted for Sellur Raju
+INFO 2026-01-24 10:11:07,342 utils Attempting to send OTP to gicete2030@okexbit.com for login
+INFO 2026-01-24 10:11:10,797 utils OTP sent successfully to gicete2030@okexbit.com
+INFO 2026-01-24 10:11:10,799 views OTP sent to gicete2030@okexbit.com for login
+INFO 2026-01-24 10:12:01,298 utils OTP verified successfully
+INFO 2026-01-24 10:12:01,925 views User parthiban verified OTP successfully

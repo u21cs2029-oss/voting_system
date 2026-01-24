@@ -105,6 +105,10 @@
             background: #f8f9fa;
         }
         
+        .winner-row {
+            background: #d4edda !important;
+        }
+        
         .winner-badge {
             background: #28a745;
             color: white;
@@ -127,6 +131,27 @@
             font-weight: 700;
             color: #333;
             margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.8em;
+            transition: width 0.5s;
         }
         
         .buttons {
@@ -205,43 +230,55 @@
             <p style="color: #888;">Live Constituency-wise Results</p>
         </div>
         
+        <!-- Statistics -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon">🗳️</div>
-                <div class="stat-value">{{ total_votes_overall }}</div>
+                <div class="stat-value">{{ total_votes_overall|default:"0" }}</div>
                 <div class="stat-label">Total Votes</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">📈</div>
-                <div class="stat-value">{{ voter_turnout }}%</div>
-                <div class="stat-label">Voter Turnout</div>
+                <div class="stat-icon">👥</div>
+                <div class="stat-value">
+                    {% if constituency_stats %}
+                        {{ constituency_stats|length }}
+                    {% else %}
+                        0
+                    {% endif %}
+                </div>
+                <div class="stat-label">Constituencies</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">📍</div>
-                <div class="stat-value">{{ constituency_stats|length }}</div>
-                <div class="stat-label">Constituencies</div>
+                <div class="stat-icon">📈</div>
+                <div class="stat-value">{{ voter_turnout|default:"0" }}%</div>
+                <div class="stat-label">Voter Turnout</div>
             </div>
         </div>
         
-        <!-- My Constituency Results -->
+        <!-- My Constituency Results (if user is logged in) -->
+        {% if user_constituency %}
         <div class="section">
             <div class="section-title">📍 Your Constituency: {{ user_constituency.name }}</div>
             
             {% if my_constituency_results %}
-                <p style="color: #666; margin-bottom: 15px;">Total Votes: <strong>{{ my_total_votes }}</strong></p>
+                <p style="color: #666; margin-bottom: 15px;">
+                    Total Votes: <strong>{{ my_total_votes }}</strong>
+                </p>
                 
                 <table class="result-table">
                     <thead>
                         <tr>
+                            <th>Rank</th>
                             <th>Candidate</th>
                             <th>Party</th>
                             <th style="text-align: center;">Votes</th>
-                            <th style="text-align: center;">%</th>
+                            <th style="text-align: center;">Percentage</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for result in my_constituency_results %}
-                        <tr>
+                        <tr {% if forloop.first %}class="winner-row"{% endif %}>
+                            <td><strong>#{{ forloop.counter }}</strong></td>
                             <td>
                                 <strong>{{ result.candidate__name }}</strong>
                                 {% if forloop.first %}
@@ -251,7 +288,11 @@
                             <td>{{ result.candidate__party }}</td>
                             <td style="text-align: center;"><strong>{{ result.total }}</strong></td>
                             <td style="text-align: center;">
-                                {% widthratio result.total my_total_votes 100 %}%
+                                <div class="progress-bar">
+                                    <div class="progress-fill" data-width="{% widthratio result.total my_total_votes 100 %}">
+                                        {% widthratio result.total my_total_votes 100 %}%
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -261,61 +302,101 @@
                 <p class="no-votes">No votes cast in your constituency yet.</p>
             {% endif %}
         </div>
+        {% endif %}
         
         <!-- All Constituencies Results -->
         <div class="section">
             <div class="section-title">🏛️ All Constituencies</div>
             
-            {% for stat in constituency_stats %}
-                <div class="constituency-card">
-                    <div class="constituency-name">{{ stat.constituency.name }}</div>
-                    <p style="color: #666; font-size: 0.9em; margin-bottom: 12px;">
-                        Total Votes: <strong>{{ stat.total_votes }}</strong>
-                    </p>
-                    
-                    {% if stat.results %}
-                        <table class="result-table" style="font-size: 0.9em;">
-                            <thead>
-                                <tr>
-                                    <th>Candidate</th>
-                                    <th>Party</th>
-                                    <th style="text-align: center;">Votes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for result in stat.results %}
-                                <tr>
-                                    <td>
-                                        {{ result.candidate__name }}
-                                        {% if forloop.first %}
-                                            <span class="winner-badge">Winner</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ result.candidate__party }}</td>
-                                    <td style="text-align: center;"><strong>{{ result.total }}</strong></td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <p class="no-votes">No votes yet</p>
-                    {% endif %}
+            {% if constituency_stats %}
+                {% for stat in constituency_stats %}
+                    <div class="constituency-card">
+                        <div class="constituency-name">{{ stat.constituency.name }}</div>
+                        <p style="color: #666; font-size: 0.9em; margin-bottom: 12px;">
+                            Total Votes: <strong>{{ stat.total_votes }}</strong>
+                        </p>
+                        
+                        {% if stat.results %}
+                            <table class="result-table" style="font-size: 0.9em;">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Candidate</th>
+                                        <th>Party</th>
+                                        <th style="text-align: center;">Votes</th>
+                                        <th style="text-align: center;">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for result in stat.results %}
+                                    <tr {% if forloop.first %}class="winner-row"{% endif %}>
+                                        <td><strong>#{{ forloop.counter }}</strong></td>
+                                        <td>
+                                            <strong>{{ result.candidate__name }}</strong>
+                                            {% if forloop.first %}
+                                                <span class="winner-badge">🏆</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ result.candidate__party }}</td>
+                                        <td style="text-align: center;"><strong>{{ result.total }}</strong></td>
+                                        <td style="text-align: center;">
+                                            {% if stat.total_votes > 0 %}
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" data-width="{% widthratio result.total stat.total_votes 100 %}">
+                                                        {% widthratio result.total stat.total_votes 100 %}%
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                0%
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p class="no-votes">No votes cast yet in this constituency</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-votes">
+                    <p style="font-size: 1.2em; margin-bottom: 10px;">📍</p>
+                    <p>No constituencies found. Please add constituencies to see results.</p>
                 </div>
-            {% endfor %}
+            {% endif %}
         </div>
         
-        <div style="text-align: center;">
+        <!-- Action Buttons -->
+        <div style="text-align: center; margin-top: 30px;">
             <div class="buttons">
-                {% if not has_voted %}
-                    <a href="{% url 'vote' %}" class="btn btn-primary">🗳️ Cast Your Vote</a>
+                {% if user.is_authenticated %}
+                    {% if not has_voted %}
+                        <a href="{% url 'vote' %}" class="btn btn-primary">🗳️ Cast Your Vote</a>
+                    {% endif %}
+                    <a href="{% url 'home' %}" class="btn btn-secondary">🏠 Home</a>
+                    <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-logout">🚪 Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'home' %}" class="btn btn-primary">🏠 Home</a>
+                    <a href="{% url 'otp_login' %}" class="btn btn-secondary">🔑 Login</a>
                 {% endif %}
-                <a href="{% url 'home' %}" class="btn btn-secondary">🏠 Home</a>
-                <form method="post" action="{% url 'logout' %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-logout">🚪 Logout</button>
-                </form>
             </div>
         </div>
     </div>
+    
+    <script>
+        // Apply width to progress bars using JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.progress-fill').forEach(function(el) {
+                const width = el.getAttribute('data-width');
+                if (width) {
+                    el.style.width = width + '%';
+                }
+            });
+        });
+    </script>
 </body>
 </html>

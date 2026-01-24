@@ -23,22 +23,21 @@
         
         .container {
             background: white;
-            padding: 35px 40px;
+            padding: 40px;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            text-align: center;
-            max-width: 550px;
+            max-width: 480px;
             width: 100%;
             position: relative;
         }
         
         .admin-link {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 20px;
+            right: 20px;
             padding: 8px 16px;
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
+            background: #667eea;
+            color: white;
             text-decoration: none;
             border-radius: 20px;
             font-size: 0.85em;
@@ -47,80 +46,141 @@
         }
         
         .admin-link:hover {
-            background: #667eea;
-            color: white;
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
         }
         
         .icon {
-            font-size: 3em;
+            font-size: 3.5em;
             margin-bottom: 15px;
         }
         
         h1 {
             color: #667eea;
             font-size: 2em;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
         
         .subtitle {
             color: #888;
             font-size: 0.95em;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
         }
         
-        p {
-            color: #666;
-            font-size: 1em;
-            margin-bottom: 30px;
-            line-height: 1.6;
+        .user-info {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 0.85em;
+            margin-left: 8px;
+        }
+        
+        .admin-badge {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .voter-badge {
+            background: #28a745;
+            color: white;
         }
         
         .features {
             display: flex;
-            gap: 15px;
+            gap: 12px;
+            margin: 20px 0;
             justify-content: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
         }
         
         .feature {
             flex: 1;
-            min-width: 140px;
-            padding: 15px 10px;
+            text-align: center;
+            padding: 15px 8px;
             background: #f8f9fa;
-            border-radius: 12px;
+            border-radius: 10px;
         }
         
         .feature-icon {
-            font-size: 1.8em;
-            margin-bottom: 8px;
+            font-size: 2em;
+            margin-bottom: 5px;
         }
         
         .feature-text {
             color: #555;
-            font-size: 0.85em;
+            font-size: 0.8em;
             font-weight: 600;
+        }
+        
+        .action-cards {
+            display: grid;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .card-icon {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+        }
+        
+        .card h3 {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        
+        .card p {
+            font-size: 0.85em;
+            opacity: 0.9;
         }
         
         .buttons {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             justify-content: center;
-            flex-wrap: wrap;
+            margin-top: 20px;
         }
         
         .btn {
-            padding: 14px 35px;
-            font-size: 1.05em;
+            padding: 12px 30px;
+            font-size: 1em;
             border: none;
             border-radius: 25px;
             cursor: pointer;
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         
         .btn-primary {
@@ -129,8 +189,8 @@
         }
         
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
         }
         
         .btn-secondary {
@@ -142,50 +202,210 @@
         .btn-secondary:hover {
             background: #667eea;
             color: white;
-            transform: translateY(-3px);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .messages {
+            margin-bottom: 15px;
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .admin-card {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            text-decoration: none;
+            color: #856404;
+            transition: all 0.3s;
+            border: 2px solid #ffc107;
+        }
+        
+        .admin-card:hover {
+            background: #ffc107;
+            color: white;
+            transform: scale(1.02);
+        }
+        
+        .admin-card-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        .admin-card-title {
+            font-size: 0.85em;
+            font-weight: 700;
         }
         
         @media (max-width: 600px) {
             .container { padding: 30px 25px; }
-            h1 { font-size: 1.7em; }
-            .buttons { flex-direction: column; }
-            .btn { width: 100%; justify-content: center; }
+            h1 { font-size: 1.8em; }
+            .features { flex-direction: column; }
+            .admin-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="/admin/" class="admin-link">🔐 Admin</a>
+        <!-- Admin Login Button (Always Visible) -->
+        <a href="{% url 'admin_choice' %}" class="admin-link">🔐 Admin</a>
         
-        <div class="icon">🗳️</div>
-        <h1>Online Voting System</h1>
-        <p class="subtitle">Your Voice, Your Choice</p>
-        
-        <p>Secure, transparent, and democratic elections for everyone.</p>
-        
-        <div class="features">
-            <div class="feature">
-                <div class="feature-icon">🔒</div>
-                <div class="feature-text">Secure</div>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">✅</div>
-                <div class="feature-text">One Vote</div>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">📧</div>
-                <div class="feature-text">OTP</div>
-            </div>
+        <div class="header">
+            <div class="icon">🗳️</div>
+            <h1>Online Voting System</h1>
+            <p class="subtitle">Your Voice, Your Choice</p>
         </div>
         
-        <div class="buttons">
-            <a href="{% url 'register' %}" class="btn btn-primary">
-                📝 Register
-            </a>
-            <a href="{% url 'otp_login' %}" class="btn btn-secondary">
-                🔑 Login
-            </a>
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {% if message.tags == 'error' %}❌{% elif message.tags == 'success' %}✅{% else %}⚠️{% endif %}
+                {{ message }}
+            </div>
+            {% endfor %}
         </div>
+        {% endif %}
+        
+        {% if user.is_authenticated %}
+            <!-- User Info -->
+            <div class="user-info">
+                <strong>{{ user.username }}</strong>
+                {% if user.is_staff or user.is_superuser %}
+                    <span class="role-badge admin-badge">ADMIN</span>
+                {% else %}
+                    <span class="role-badge voter-badge">VOTER</span>
+                {% endif %}
+            </div>
+            
+            {% if user.is_staff or user.is_superuser %}
+                <!-- ADMIN VIEW -->
+                <h3 style="text-align: center; color: #667eea; margin: 15px 0;">Analytics Dashboard</h3>
+                <div class="admin-grid">
+                    <a href="{% url 'analytics_dashboard' %}" class="admin-card">
+                        <div class="admin-card-icon">📊</div>
+                        <div class="admin-card-title">Dashboard</div>
+                    </a>
+                    <a href="{% url 'pattern_analysis' %}" class="admin-card">
+                        <div class="admin-card-icon">🔍</div>
+                        <div class="admin-card-title">Patterns</div>
+                    </a>
+                    <a href="{% url 'ml_predictions' %}" class="admin-card">
+                        <div class="admin-card-icon">🤖</div>
+                        <div class="admin-card-title">ML Predictions</div>
+                    </a>
+                    <a href="{% url 'anomaly_detection' %}" class="admin-card">
+                        <div class="admin-card-icon">⚠️</div>
+                        <div class="admin-card-title">Anomalies</div>
+                    </a>
+                </div>
+                
+                <div class="action-cards">
+                    <a href="/admin/" class="card">
+                        <div class="card-icon">⚙️</div>
+                        <h3>System Admin</h3>
+                    </a>
+                    <a href="{% url 'result' %}" class="card">
+                        <div class="card-icon">📈</div>
+                        <h3>View Results</h3>
+                    </a>
+                </div>
+                
+            {% else %}
+                <!-- VOTER VIEW -->
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon">🔒</div>
+                        <div class="feature-text">Secure</div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">✅</div>
+                        <div class="feature-text">One Vote</div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">📧</div>
+                        <div class="feature-text">OTP</div>
+                    </div>
+                </div>
+                
+                <div class="action-cards">
+                    <a href="{% url 'vote' %}" class="card">
+                        <div class="card-icon">🗳️</div>
+                        <h3>Cast Your Vote</h3>
+                        <p>Exercise your democratic right</p>
+                    </a>
+                    <a href="{% url 'result' %}" class="card">
+                        <div class="card-icon">📊</div>
+                        <h3>View Results</h3>
+                        <p>See election results</p>
+                    </a>
+                </div>
+            {% endif %}
+            
+            <div class="buttons">
+                <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+            </div>
+            
+        {% else %}
+            <!-- PUBLIC VIEW -->
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <div class="feature-text">Secure</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">✅</div>
+                    <div class="feature-text">One Vote</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📧</div>
+                    <div class="feature-text">OTP</div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <a href="{% url 'register' %}" class="btn btn-primary">📝 Register</a>
+                <a href="{% url 'otp_login' %}" class="btn btn-secondary">🔑 Login</a>
+            </div>
+        {% endif %}
     </div>
 </body>
 </html>

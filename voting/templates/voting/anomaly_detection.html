@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anomaly Detection</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 { 
+            font-size: 2em; 
+            margin-bottom: 8px; 
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            padding: 10px 20px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 600;
+            border: 2px solid #667eea;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+        
+        .nav-link:hover { 
+            background: #667eea; 
+            color: white; 
+        }
+        
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #dc3545;
+        }
+        
+        .alert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-card {
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .alert-card h3 {
+            font-size: 1em;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+        
+        .alert-card .value {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin: 15px 0;
+        }
+        
+        .badge-safe {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-caution {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .badge-alert {
+            background: #dc3545;
+            color: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        table th {
+            background: #dc3545;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.9em;
+        }
+        
+        table tr:hover { 
+            background: #f8f9fa; 
+        }
+        
+        .anomaly-row {
+            background: #fff3cd !important;
+        }
+        
+        .critical-row {
+            background: #f8d7da !important;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            padding: 15px;
+            border-left: 4px solid #0056b3;
+            border-radius: 5px;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .metric-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .metric-item strong {
+            display: block;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        
+        .metric-item span {
+            font-size: 1.8em;
+            color: #333;
+            font-weight: 700;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.5em; }
+            .section { padding: 15px; }
+            .alert-card .value { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚠️ Anomaly Detection System</h1>
+        <p>Real-time security monitoring and fraud detection</p>
+    </div>
+    
+    <div class="nav-links">
+        <a href="{% url 'analytics_dashboard' %}" class="nav-link">📊 Dashboard</a>
+        <a href="{% url 'pattern_analysis' %}" class="nav-link">🔍 Patterns</a>
+        <a href="{% url 'ml_predictions' %}" class="nav-link">🤖 ML Predictions</a>
+        <a href="{% url 'anomaly_detection' %}" class="nav-link">⚠️ Anomalies</a>
+        <a href="{% url 'home' %}" class="nav-link">🏠 Home</a>
+    </div>
+    
+    <!-- System Status -->
+    <div class="section">
+        <h2 class="section-title">🛡️ Security Status</h2>
+        <div style="text-align: center;">
+            {% if anomaly_summary.total_anomalies == 0 %}
+                <span class="status-badge badge-safe">✓ ALL SYSTEMS SECURE</span>
+                <p style="margin-top: 15px; color: #28a745; font-size: 1.1em;">
+                    No anomalies detected. Voting patterns are normal.
+                </p>
+            {% elif anomaly_summary.total_anomalies < 5 %}
+                <span class="status-badge badge-caution">⚠ MINOR ALERTS</span>
+                <p style="margin-top: 15px; color: #856404; font-size: 1.1em;">
+                    {{ anomaly_summary.total_anomalies }} minor anomalies detected. Monitoring continues.
+                </p>
+            {% else %}
+                <span class="status-badge badge-alert">❌ CRITICAL ALERTS</span>
+                <p style="margin-top: 15px; color: #721c24; font-size: 1.1em;">
+                    {{ anomaly_summary.total_anomalies }} anomalies detected. Immediate attention required!
+                </p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Alert Summary Cards -->
+    <div class="alert-grid">
+        <div class="alert-card {% if anomaly_summary.total_anomalies == 0 %}alert-success{% elif anomaly_summary.total_anomalies < 5 %}alert-warning{% else %}alert-danger{% endif %}">
+            <h3>Total Anomalies</h3>
+            <div class="value">{{ anomaly_summary.total_anomalies|default:"0" }}</div>
+            <p>Detected Issues</p>
+        </div>
+        
+        <div class="alert-card {% if anomaly_summary.unusual_times == 0 %}alert-success{% else %}alert-warning{% endif %}">
+            <h3>Unusual Times</h3>
+            <div class="value">{{ anomaly_summary.unusual_times|default:"0" }}</div>
+            <p>Off-peak Voting</p>
+        </div>
+        
+        <div class="alert-card {% if anomaly_summary.suspicious_patterns == 0 %}alert-success{% else %}alert-danger{% endif %}">
+            <h3>Suspicious Patterns</h3>
+            <div class="value">{{ anomaly_summary.suspicious_patterns|default:"0" }}</div>
+            <p>Irregular Activity</p>
+        </div>
+        
+        <div class="alert-card alert-success">
+            <h3>Total Votes Analyzed</h3>
+            <div class="value">{{ total_votes|default:"0" }}</div>
+            <p>Data Points</p>
+        </div>
+    </div>
+    
+    <!-- Statistical Analysis -->
+    <div class="section">
+        <h2 class="section-title">📊 Statistical Analysis</h2>
+        <div class="info-box">
+            <strong>🔬 Detection Method:</strong> Z-Score Analysis (Statistical Outlier Detection)
+            <br><br>
+            Z-Score measures how many standard deviations a data point is from the mean.
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li><strong>Z-Score < 2:</strong> Normal pattern ✓</li>
+                <li><strong>Z-Score 2-3:</strong> Unusual but acceptable ⚠</li>
+                <li><strong>Z-Score > 3:</strong> Anomaly detected! ❌</li>
+            </ul>
+        </div>
+        
+        {% if statistical_metrics %}
+        <div class="metric-grid">
+            <div class="metric-item">
+                <strong>Mean Votes/Hour</strong>
+                <span>{{ statistical_metrics.mean|floatformat:2 }}</span>
+            </div>
+            <div class="metric-item">
+                <strong>Std Deviation</strong>
+                <span>{{ statistical_metrics.std_dev|floatformat:2 }}</span>
+            </div>
+            <div class="metric-item">
+                <strong>Threshold (Z=3)</strong>
+                <span>{{ statistical_metrics.threshold|floatformat:0 }}</span>
+            </div>
+            <div class="metric-item">
+                <strong>Max Votes/Hour</strong>
+                <span>{{ statistical_metrics.max_votes }}</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Anomaly Visualization -->
+    <div class="section">
+        <h2 class="section-title">📈 Hourly Voting Pattern with Anomalies</h2>
+        <div class="chart-container">
+            <canvas id="anomalyChart"></canvas>
+        </div>
+        <div class="warning-box">
+            <strong>📌 How to Read:</strong> Red bars indicate unusual voting activity. 
+            Green line shows the threshold for normal behavior.
+        </div>
+    </div>
+    
+    <!-- Detailed Anomaly Table -->
+    <div class="section">
+        <h2 class="section-title">🔍 Detailed Anomaly Report</h2>
+        
+        {% if anomaly_details %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Hour</th>
+                    <th>Votes Count</th>
+                    <th>Z-Score</th>
+                    <th>Status</th>
+                    <th>Severity</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detail in anomaly_details %}
+                <tr class="{% if detail.is_critical %}critical-row{% elif detail.is_anomaly %}anomaly-row{% endif %}">
+                    <td><strong>{{ detail.hour }}:00</strong></td>
+                    <td>{{ detail.votes }}</td>
+                    <td>{{ detail.z_score|floatformat:2 }}</td>
+                    <td>
+                        {% if detail.is_critical %}
+                            <strong style="color: #dc3545;">❌ CRITICAL</strong>
+                        {% elif detail.is_anomaly %}
+                            <strong style="color: #ffc107;">⚠ WARNING</strong>
+                        {% else %}
+                            <span style="color: #28a745;">✓ Normal</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if detail.is_critical %}
+                            <strong>High</strong>
+                        {% elif detail.is_anomaly %}
+                            Medium
+                        {% else %}
+                            Low
+                        {% endif %}
+                    </td>
+                    <td>{{ detail.recommendation }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="info-box">
+            <p style="text-align: center; margin: 20px 0;">
+                ℹ️ No data available for analysis yet. Cast some votes to see anomaly detection in action!
+            </p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Time-based Anomalies -->
+    <div class="section">
+        <h2 class="section-title">⏰ Unusual Voting Times</h2>
+        {% if unusual_times %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Voter ID</th>
+                    <th>Constituency</th>
+                    <th>Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in unusual_times %}
+                <tr>
+                    <td>{{ item.timestamp }}</td>
+                    <td>{{ item.voter_id }}</td>
+                    <td>{{ item.constituency }}</td>
+                    <td>{{ item.reason }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color: #28a745; padding: 15px; text-align: center;">
+            ✓ No unusual voting times detected. All votes within normal hours.
+        </p>
+        {% endif %}
+    </div>
+    
+    <!-- Recommendations -->
+    <div class="section">
+        <h2 class="section-title">💡 Recommendations</h2>
+        <div class="info-box">
+            <h3 style="margin-bottom: 10px; color: #0056b3;">For Project Demonstration:</h3>
+            <ol style="margin-left: 20px; line-height: 1.8;">
+                <li><strong>Normal Scenario:</strong> Cast votes during typical hours (9 AM - 6 PM)</li>
+                <li><strong>Test Anomalies:</strong> Cast multiple votes at unusual hours (before 6 AM or after 10 PM)</li>
+                <li><strong>Observe Detection:</strong> Refresh page to see Z-scores and alerts</li>
+                <li><strong>Explain Algorithm:</strong> Discuss statistical significance and thresholds</li>
+            </ol>
+        </div>
+        
+        {% if anomaly_summary.total_anomalies > 0 %}
+        <div class="warning-box">
+            <h3 style="margin-bottom: 10px;">⚠️ Action Items:</h3>
+            <ul style="margin-left: 20px; line-height: 1.8;">
+                <li>Review flagged voting times for potential fraud</li>
+                <li>Verify voter identities for critical anomalies</li>
+                <li>Increase monitoring during detected unusual hours</li>
+                <li>Generate detailed audit reports for authorities</li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- For Viva/Report -->
+    <div class="section">
+        <h2 class="section-title">🎓 Technical Explanation (For Viva)</h2>
+        
+        <h3 style="margin: 15px 0 10px 0; color: #dc3545;">What is Anomaly Detection?</h3>
+        <p style="line-height: 1.8;">
+            Anomaly detection identifies unusual patterns that don't conform to expected behavior. 
+            In voting systems, this helps detect fraud, system errors, or suspicious activities.
+        </p>
+        
+        <h3 style="margin: 20px 0 10px 0; color: #dc3545;">Algorithm Used: Z-Score Method</h3>
+        <p style="line-height: 1.8; margin-bottom: 10px;">
+            <strong>Formula:</strong> Z = (X - μ) / σ
+        </p>
+        <ul style="margin-left: 20px; line-height: 1.8;">
+            <li><strong>X:</strong> Actual votes in an hour</li>
+            <li><strong>μ (mu):</strong> Mean (average) votes per hour</li>
+            <li><strong>σ (sigma):</strong> Standard deviation</li>
+        </ul>
+        
+        <h3 style="margin: 20px 0 10px 0; color: #dc3545;">Why This Matters:</h3>
+        <ul style="margin-left: 20px; line-height: 1.8;">
+            <li><strong>Election Security:</strong> Detect vote manipulation attempts</li>
+            <li><strong>Fraud Prevention:</strong> Identify suspicious voting patterns</li>
+            <li><strong>System Integrity:</strong> Ensure fair and transparent elections</li>
+            <li><strong>Real-time Alerts:</strong> Immediate notification of irregularities</li>
+        </ul>
+    </div>
+    
+    <script>
+        // Prepare chart data - safely parse Django variables
+        const hourlyLabels = JSON.parse('{{ hourly_labels|safe }}' || '[]');
+        const hourlyVotes = JSON.parse('{{ hourly_votes|safe }}' || '[]');
+        const anomalyFlags = JSON.parse('{{ anomaly_flags|safe }}' || '[]');
+        const threshold = parseFloat('{{ threshold|default:"0" }}');
+        
+        // Create background colors based on anomaly flags
+        const backgroundColors = anomalyFlags.map(isAnomaly => 
+            isAnomaly ? 'rgba(220, 53, 69, 0.7)' : 'rgba(40, 167, 69, 0.7)'
+        );
+        
+        const borderColors = anomalyFlags.map(isAnomaly => 
+            isAnomaly ? 'rgba(220, 53, 69, 1)' : 'rgba(40, 167, 69, 1)'
+        );
+        
+        // Create the chart
+        const ctx = document.getElementById('anomalyChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: hourlyLabels,
+                datasets: [
+                    {
+                        label: 'Votes per Hour',
+                        data: hourlyVotes,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Anomaly Threshold',
+                        data: Array(hourlyLabels.length).fill(threshold),
+                        type: 'line',
+                        borderColor: 'rgba(255, 193, 7, 1)',
+                        borderWidth: 3,
+                        borderDash: [10, 5],
+                        fill: false,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return anomalyFlags[context.dataIndex] ? 
+                                        '⚠️ ANOMALY DETECTED!' : '✓ Normal';
+                                }
+                                return '';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,8 +1,9 @@
 """
-Updated views.py - All bugs fixed
+Updated views.py - Fixed admin access and login redirect issues
 """
 
 import logging
+import json
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
@@ -24,6 +25,47 @@ logger = logging.getLogger(__name__)
 def home(request):
     """Home page view"""
     return render(request, "voting/home.html")
+
+
+# ---------------- ADMIN CHOICE ----------------
+def admin_choice(request):
+    """
+    Admin login page - allows admin to login with username/password
+    Regular users use OTP login, admins can use this page
+    """
+    # If already logged in as admin, redirect to home (they'll see admin dashboard)
+    if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
+        return redirect('home')
+    
+    if request.method == "POST":
+        username = request.POST.get("username", "").strip()
+        password = request.POST.get("password", "").strip()
+        
+        if not username or not password:
+            messages.error(request, "Both username and password are required")
+            return render(request, "voting/admin_choice.html")
+        
+        # Authenticate user
+        user = authenticate(request, username=username, password=password)
+        
+        if user is None:
+            messages.error(request, "Invalid username or password")
+            return render(request, "voting/admin_choice.html")
+        
+        # Check if user is admin
+        if not (user.is_staff or user.is_superuser):
+            messages.error(request, "Admin access required. Please use voter login.")
+            return render(request, "voting/admin_choice.html")
+        
+        # Login the admin user
+        login(request, user)
+        messages.success(request, f"Welcome back, {user.username}!")
+        logger.info(f"Admin {user.username} logged in successfully")
+        
+        # Redirect to home - they'll see admin dashboard
+        return redirect('home')
+    
+    return render(request, 'voting/admin_choice.html')
 
 
 # ---------------- REGISTER ----------------
@@ -332,7 +374,7 @@ def vote(request):
             if Vote.objects.filter(user=request.user).exists():
                 return render(request, "voting/already_voted.html")
 
-            # Create the vote - THIS WAS THE BUG!
+            # Create the vote
             Vote.objects.create(
                 user=request.user,
                 candidate=candidate
@@ -344,7 +386,7 @@ def vote(request):
             return render(request, "voting/vote_success.html", {
                 "constituency": profile.constituency.name,
                 "candidate": candidate,
-                "user": request.user  # Pass user to template
+                "user": request.user
             })
 
         except Candidate.DoesNotExist:
@@ -367,40 +409,59 @@ def vote(request):
     })
 
 
-# ---------------- RESULT (CONSTITUENCY-WISE) ----------------
-@login_required(login_url='otp_login')
+# ---------------- RESULTS ----------------
 def result(request):
-    """Display voting results - constituency-wise"""
+    """
+    Display voting results - PUBLIC ACCESS (no login required)
+    Shows all candidates with vote counts
+    """
     try:
-        # Get user's constituency
-        user_profile = VoterProfile.objects.get(user=request.user)
-        user_constituency = user_profile.constituency
-        
         # Get all constituencies
         all_constituencies = Constituency.objects.all()
         
-        # Get results for user's constituency
-        my_constituency_results = Vote.objects.filter(
-            candidate__constituency=user_constituency
-        ).values(
-            "candidate__name",
-            "candidate__party"
-        ).annotate(
-            total=Count("candidate")
-        ).order_by("-total")
+        # Calculate overall statistics
+        total_votes_overall = Vote.objects.count()
+        total_voters = User.objects.filter(voterprofile__isnull=False).count()
+        voter_turnout = round((total_votes_overall / total_voters * 100), 2) if total_voters > 0 else 0
         
-        # Get total votes in user's constituency
-        my_total_votes = Vote.objects.filter(
-            candidate__constituency=user_constituency
-        ).count()
+        # Initialize variables for user constituency (if logged in)
+        user_constituency = None
+        my_constituency_results = []
+        my_total_votes = 0
+        has_voted = False
+        
+        # If user is logged in, get their constituency info
+        if request.user.is_authenticated:
+            try:
+                user_profile = VoterProfile.objects.get(user=request.user)
+                user_constituency = user_profile.constituency
+                has_voted = Vote.objects.filter(user=request.user).exists()
+                
+                # Get results for user's constituency
+                my_constituency_results = Vote.objects.filter(
+                    candidate__constituency=user_constituency
+                ).values(
+                    "candidate__name",
+                    "candidate__party"
+                ).annotate(
+                    total=Count("candidate")
+                ).order_by("-total")
+                
+                my_total_votes = Vote.objects.filter(
+                    candidate__constituency=user_constituency
+                ).count()
+            except VoterProfile.DoesNotExist:
+                pass  # User doesn't have a voter profile
         
         # Get all constituency results
         constituency_stats = []
         for const in all_constituencies:
+            # Get vote count for this constituency
             const_votes = Vote.objects.filter(
                 candidate__constituency=const
             ).count()
             
+            # Get ALL candidates and their votes in this constituency
             const_results = Vote.objects.filter(
                 candidate__constituency=const
             ).values(
@@ -410,7 +471,7 @@ def result(request):
                 total=Count("candidate")
             ).order_by("-total")
             
-            # Get winner
+            # Get winner (candidate with most votes)
             winner = const_results.first() if const_results else None
             
             constituency_stats.append({
@@ -420,26 +481,18 @@ def result(request):
                 'winner': winner
             })
         
-        # Overall statistics
-        total_votes_overall = Vote.objects.count()
-        total_voters = VoterProfile.objects.count()
-        voter_turnout = (total_votes_overall / total_voters * 100) if total_voters > 0 else 0
+        context = {
+            'total_votes_overall': total_votes_overall,
+            'voter_turnout': voter_turnout,
+            'constituency_stats': constituency_stats,
+            'user_constituency': user_constituency,
+            'my_constituency_results': my_constituency_results,
+            'my_total_votes': my_total_votes,
+            'has_voted': has_voted,
+        }
         
-        # Check if user has voted
-        has_voted = Vote.objects.filter(user=request.user).exists()
+        return render(request, "voting/result.html", context)
         
-        return render(request, "voting/result.html", {
-            "user_constituency": user_constituency,
-            "my_constituency_results": my_constituency_results,
-            "my_total_votes": my_total_votes,
-            "constituency_stats": constituency_stats,
-            "total_votes_overall": total_votes_overall,
-            "voter_turnout": round(voter_turnout, 2),
-            "has_voted": has_voted
-        })
-    except VoterProfile.DoesNotExist:
-        messages.error(request, "Voter profile not found")
-        return redirect("home")
     except Exception as e:
         logger.exception(f"Error displaying results: {str(e)}")
         messages.error(request, "Error loading results")
@@ -448,16 +501,10 @@ def result(request):
 
 # ---------------- LOGOUT ----------------
 def logout_view(request):
-    """Logout user - Fixed to work with both GET and POST"""
-    if request.method == "POST":
-        logout(request)
-        messages.success(request, "You have been logged out successfully")
-        return redirect("home")
-    else:
-        # If accessed via GET, show confirmation or just logout
-        logout(request)
-        messages.success(request, "You have been logged out successfully")
-        return redirect("home")
+    """Logout user"""
+    logout(request)
+    messages.success(request, "You have been logged out successfully")
+    return redirect("home")
 
 
 # ---------------- ALREADY VOTED ----------------

@@ -24,6 +24,9 @@ urlpatterns = [
     
     # Results
     path('result/', views.result, name='result'),
+    
+    # Admin Choice Page - NEW!
+    path('admin-choice/', views.admin_choice, name='admin_choice'),
 
     # Analytics URLs (Admin only)
     path('analytics/', analytics_views.analytics_dashboard, name='analytics_dashboard'),
